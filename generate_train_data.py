@@ -5,6 +5,7 @@ import random
 import pymysql
 import datetime
 from copy import deepcopy
+from operator import itemgetter
 from utils import get_use_months
 from utils import get_previous_month
 
@@ -227,6 +228,9 @@ def generate_train_data(train_ratio, test_ratio, test_fault_window):
     cursor.execute(query)
     rows = cursor.fetchall()
     print('zt_dt_fault读取完毕')
+
+    # 将所有特征按照form_create_time字段排序，其位置为9
+    rows.sort(key=itemgetter(9))
 
     fault_ele_list = deepcopy(rows)
     fault_ele_num = len(fault_ele_list)

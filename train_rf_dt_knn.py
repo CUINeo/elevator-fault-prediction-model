@@ -6,7 +6,6 @@ import numpy as np
 from joblib import dump
 from sklearn import svm
 from copy import deepcopy
-from operator import itemgetter
 from utils import get_current_date
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -40,8 +39,6 @@ def train_rf_dt_knn(test_set_len):
     for row in rows:
         row[60] = str(row[60])
 
-    # 将所有特征按照date字段排序，其位置为60
-    rows.sort(key=itemgetter(60))
     whole_set_len = len(rows)
     cnt = 0
 
@@ -57,6 +54,9 @@ def train_rf_dt_knn(test_set_len):
         else:
             test_X.append(row[1:60])
             test_Y.append(row[0])
+
+    print(len(train_X))
+    print(len(test_X))
 
     train_X = np.asarray(train_X, dtype=np.float32)
     train_Y = np.asarray(train_Y, dtype=np.float32)
@@ -77,8 +77,8 @@ def train_rf_dt_knn(test_set_len):
     print('Random Forest: validate score: ' + str(clf.score(test_X, test_Y)))
     pred_test_Y = clf.predict(test_X)
     print(confusion_matrix(test_Y, pred_test_Y))
-    print(classification_report(test_Y, pred_test_Y))
-    performance(method, confusion_matrix(test_Y, pred_test_Y))
+    # print(classification_report(test_Y, pred_test_Y))
+    # performance(method, confusion_matrix(test_Y, pred_test_Y))
     dump(clf, 'rf.joblib')
 
     method = train_decision_tree
@@ -90,8 +90,8 @@ def train_rf_dt_knn(test_set_len):
     print('Decision Tree: validate score: ' + str(clf.score(test_X, test_Y)))
     pred_test_Y = clf.predict(test_X)
     print(confusion_matrix(test_Y, pred_test_Y))
-    print(classification_report(test_Y, pred_test_Y))
-    performance(method, confusion_matrix(test_Y, pred_test_Y))
+    # print(classification_report(test_Y, pred_test_Y))
+    # performance(method, confusion_matrix(test_Y, pred_test_Y))
     dump(clf, 'dt.joblib')
 
     method = train_knn
@@ -103,8 +103,8 @@ def train_rf_dt_knn(test_set_len):
     print('KNN: validate score: ' + str(knn.score(test_X, test_Y)))
     pred_test_Y = knn.predict(test_X)
     print(confusion_matrix(test_Y, pred_test_Y))
-    print(classification_report(test_Y, pred_test_Y))
-    performance(method, confusion_matrix(test_Y, pred_test_Y))
+    # print(classification_report(test_Y, pred_test_Y))
+    # performance(method, confusion_matrix(test_Y, pred_test_Y))
     dump(knn, 'knn.joblib')
 
     cursor.close()
