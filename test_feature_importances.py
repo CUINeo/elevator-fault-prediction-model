@@ -1,6 +1,5 @@
 from joblib import load
 
-
 clf = load('rf.joblib')
 features = ['equ_safe_level1', 'equ_safe_level2', 'equ_safe_level3', 'apply_location1', 'apply_location2', 'apply_location3',
             'apply_location4', 'apply_location5', 'apply_location6', 'apply_location7', 'apply_location8', 'apply_location9',
