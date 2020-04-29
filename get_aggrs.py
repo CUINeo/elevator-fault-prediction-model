@@ -9,7 +9,6 @@ from utils import get_current_date
 # port=3306
 # database='dt_yc'
 
-
 # 根据预测结果进行数据聚合
 def get_aggrs(threshold):
     conn = pymysql.connect(host='10.214.163.179', user='dt_yc', password='dt_yc123', port=3306, database='dt_yc')

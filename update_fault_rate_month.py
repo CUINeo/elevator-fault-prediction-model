@@ -11,7 +11,6 @@ from utils import get_current_date
 #   port=3306
 #   database='dt_yc'
 
-
 def update_fault_rate_month():
 	# 作为dict访问的默认值
 	default = -1

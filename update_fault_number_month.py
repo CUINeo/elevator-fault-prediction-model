@@ -11,7 +11,6 @@ from utils import get_current_date
 #   port=3306
 #   database='dt_yc'
 
-
 def update_fault_number_month():
     start = time.time()
     conn = pymysql.connect(host='10.214.163.179', user='dt_yc', password='dt_yc123',

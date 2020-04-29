@@ -13,7 +13,6 @@ from utils import get_current_date
 #   port=3306
 #   database='dt_yc'
 
-
 def feature_extraction():
 	# 作为dict访问的默认值
 	default = -1
@@ -348,6 +347,6 @@ def feature_extraction():
 	cursor.close()
 	conn.close()
 	elapsed = (time.time() - start)
-	print('预测特征提取完毕，总运行时间：' + str(round(elapsed/60, 2)) + '分钟')
+	print('电梯特征提取完毕，总运行时间：' + str(round(elapsed/60, 2)) + '分钟')
 	print('------------------------------------------------------')
 	print('------------------------------------------------------')
