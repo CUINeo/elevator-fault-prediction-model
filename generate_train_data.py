@@ -103,6 +103,107 @@ def generate_train_data(train_ratio, test_ratio, test_fault_window):
     cursor.execute(query)
     conn.commit()
 
+    # 统计各单位电梯数量
+	# 使用单位电梯数量
+    query1 = 'DROP TABLE IF EXISTS dt_yc.model_use_unit_ele_num'
+    query2 = """
+            CREATE TABLE dt_yc.model_use_unit_ele_num
+            SELECT USE_UNIT_CODE, COUNT(*) ELE_NUM
+            FROM dt_yc.ele_info
+            WHERE USE_UNIT_CODE != '-'
+            and USE_UNIT_CODE != '不详'
+            GROUP BY USE_UNIT_CODE
+            """		
+    query3 = 'CREATE INDEX index_use_unit_code ON dt_yc.model_use_unit_ele_num(`USE_UNIT_CODE`)'
+    cursor.execute(query1)
+    conn.commit()
+    cursor.execute(query2)
+    conn.commit()	
+    cursor.execute(query3)
+    conn.commit()
+
+    # 制造单位电梯数量
+    query1 = 'DROP TABLE IF EXISTS dt_yc.model_make_unit_ele_num'
+    query2 = """
+            CREATE TABLE dt_yc.model_make_unit_ele_num
+            SELECT MAKE_UNIT_NAME, COUNT(*) ELE_NUM
+            FROM dt_yc.ele_info
+            WHERE MAKE_UNIT_NAME is not null
+            and MAKE_UNIT_NAME != '-'
+            and MAKE_UNIT_NAME != '/'
+            GROUP BY MAKE_UNIT_NAME
+            """
+    query3 = 'CREATE INDEX index_make_unit_name ON dt_yc.model_make_unit_ele_num(`MAKE_UNIT_NAME`)'
+    cursor.execute(query1)
+    conn.commit()
+    cursor.execute(query2)
+    conn.commit()	
+    cursor.execute(query3)
+    conn.commit()
+
+    # 安装单位电梯数量
+    query1 = 'DROP TABLE IF EXISTS dt_yc.model_set_unit_ele_num'
+    query2 = """
+            CREATE TABLE dt_yc.model_set_unit_ele_num
+            SELECT SET_UNIT_NAME, COUNT(*) ELE_NUM
+            FROM dt_yc.ele_info
+            WHERE SET_UNIT_NAME is not null
+            and SET_UNIT_NAME != '-'
+            and SET_UNIT_NAME != '/'
+            GROUP BY SET_UNIT_NAME
+            """
+    query3 = 'CREATE INDEX index_set_unit_name ON dt_yc.model_set_unit_ele_num(`SET_UNIT_NAME`)'
+    cursor.execute(query1)
+    conn.commit()
+    cursor.execute(query2)
+    conn.commit()	
+    cursor.execute(query3)
+    conn.commit()
+
+    # 检验机构电梯数量
+    query1 = 'DROP TABLE IF EXISTS dt_yc.model_insp_org_ele_num'
+    query2 = """
+            CREATE TABLE dt_yc.model_insp_org_ele_num
+            SELECT INSP_ORG_NAME, COUNT(*) ELE_NUM
+            FROM dt_yc.ele_info
+            WHERE INSP_ORG_NAME is not null
+            and INSP_ORG_NAME != '-'
+            and INSP_ORG_NAME != '/'
+            GROUP BY INSP_ORG_NAME
+            """
+    query3 = 'CREATE INDEX index_insp_org_name ON dt_yc.model_insp_org_ele_num(`INSP_ORG_NAME`)'
+    cursor.execute(query1)
+    conn.commit()
+    cursor.execute(query2)
+    conn.commit()	
+    cursor.execute(query3)
+    conn.commit()
+
+    # 维保单位电梯数量
+    query1 = 'DROP TABLE IF EXISTS dt_yc.model_wb_unit_ele_num'
+    query2 = """
+            CREATE TABLE dt_yc.model_wb_unit_ele_num
+            SELECT WB_UNIT_NAME, COUNT(*) ELE_NUM
+            FROM dt_yc.ele_info
+            WHERE WB_UNIT_NAME is not null
+            and WB_UNIT_NAME != '/'
+            and WB_UNIT_NAME != '*'
+            and WB_UNIT_NAME != '0'
+            and WB_UNIT_NAME != '//'
+            and WB_UNIT_NAME != '-'
+            and WB_UNIT_NAME != '--'
+            and WB_UNIT_NAME != '**'
+            and WB_UNIT_NAME != '1'
+            GROUP BY WB_UNIT_NAME
+            """
+    query3 = 'CREATE INDEX index_wb_unit_name ON dt_yc.model_wb_unit_ele_num(`WB_UNIT_NAME`)'
+    cursor.execute(query1)
+    conn.commit()
+    cursor.execute(query2)
+    conn.commit()	
+    cursor.execute(query3)
+    conn.commit()
+
     # 读出各单位电梯数量
     # 读出dt_yc.model_use_unit_ele_num中的数据并存入use_unit_ele_num中
     query = 'SELECT * FROM dt_yc.model_use_unit_ele_num'
@@ -185,7 +286,7 @@ def generate_train_data(train_ratio, test_ratio, test_fault_window):
     rows = cursor.fetchall()
     ele_list = deepcopy(rows)
 
-    # 读出所有故障数据
+    # 读出2019-08-01后的故障数据
     query = """
             SELECT
             equ_safe_level,
@@ -226,21 +327,63 @@ def generate_train_data(train_ratio, test_ratio, test_fault_window):
             AND a.wb_unit_name != '1'
             """
     cursor.execute(query)
-    rows = cursor.fetchall()
-    print('zt_dt_fault读取完毕')
+    rows = list(cursor.fetchall())
 
-    # 将所有特征按照form_create_time字段排序，其位置为9
+    # 将2019-08-01后的所有故障数据按照form_create_time字段排序，其位置为9
     rows.sort(key=itemgetter(9))
 
-    fault_ele_list = deepcopy(rows)
+    # 读出所有故障数据
+    query = """
+            SELECT
+            equ_safe_level,
+            apply_location,
+            use_start_date,
+            exam_type,
+            a.use_unit_code,
+            a.make_unit_name,
+            a.set_unit_name,
+            a.insp_org_name,
+            a.wb_unit_name,
+            form_create_time,
+            a.tranid
+            FROM dt_yc.ele_info a, dt_yc.zt_dt_fault b
+            WHERE use_start_date is not null
+            AND a.tranid = b.tranid
+            AND a.use_unit_code is not null
+            AND a.use_unit_code != '-'
+            AND a.use_unit_code != '不详'
+            AND a.make_unit_name is not null
+            AND a.make_unit_name != '-'
+            AND a.make_unit_name != '/'
+            AND a.set_unit_name is not null
+            AND a.set_unit_name != '-'
+            AND a.set_unit_name != '/'
+            AND a.insp_org_name is not null
+            AND a.insp_org_name != '-'
+            AND a.insp_org_name != '/'
+            AND a.wb_unit_name is not null
+            AND a.wb_unit_name != '/'
+            AND a.wb_unit_name != '*'
+            AND a.wb_unit_name != '0'
+            AND a.wb_unit_name != '//'
+            AND a.wb_unit_name != '-'
+            AND a.wb_unit_name != '--'
+            AND a.wb_unit_name != '**'
+            AND a.wb_unit_name != '1'
+            """
+    cursor.execute(query)
+    fault_ele_list = list(cursor.fetchall())
     fault_ele_num = len(fault_ele_list)
+    print('故障数据读取完毕')
+
+    # 将所有故障数据tranid与form_create_time存入fault_ele_time_list中
     fault_ele_time_list = []
     for fault_ele in fault_ele_list:
         temp = [fault_ele[10], str(fault_ele[9])[0:10]]
         fault_ele_time_list.append(temp)
 
     # 插入电梯特征（数据库中只有2019-01-01之后的故障数据，所以生成训练数据时只能是用2019-08-01之后的故障数据)
-    # 最后200个故障数据用于生成测试数据（正负样本比例为1:test_ratio），其余数据用于生成训练数据（正负样本比例为1:train_ratio）
+    # 最后test_fault_window个故障数据用于生成测试数据（正负样本比例为1:test_ratio），其余数据用于生成训练数据（正负样本比例为1:train_ratio）
     cnt = 0
     fault_ele_count = 0
     ratio = train_ratio
@@ -350,7 +493,7 @@ def generate_train_data(train_ratio, test_ratio, test_fault_window):
             form_create_time_fault = str(fault_ele[9])[0:10]
             tranid_fault = fault_ele[10]
 
-            months_diff = get_use_months(form_create_time, form_create_time_fault)
+            months_diff = get_use_months(form_create_time, form_create_time_fault)            
             if months_diff > 6 or months_diff < 1:
                 continue
 
@@ -380,14 +523,17 @@ def generate_train_data(train_ratio, test_ratio, test_fault_window):
         wb = []
 
         for i in range(6):
-            _set.append(round(set_fault[i] / set_unit_ele_num.get(set_unit_name, -1), 4))
-            make.append(round(make_fault[i] / make_unit_ele_num.get(make_unit_name, -1), 4))
-            insp.append(round(insp_fault[i] / insp_org_ele_num.get(insp_org_name, -1), 4))
-            use.append(round(use_fault[i] / use_unit_ele_num.get(use_unit_code, -1), 4))
-            wb.append(round(wb_fault[i] / wb_unit_ele_num.get(wb_unit_name, -1), 4))
+            temp = round(set_fault[i] / set_unit_ele_num.get(set_unit_name, -1), 4)
+            _set.append(temp if temp >= 0 else -1)
+            temp = round(make_fault[i] / make_unit_ele_num.get(make_unit_name, -1), 4)
+            make.append(temp if temp >= 0 else -1)
+            temp = round(insp_fault[i] / insp_org_ele_num.get(insp_org_name, -1), 4)
+            insp.append(temp if temp >= 0 else -1)
+            temp = round(use_fault[i] / use_unit_ele_num.get(use_unit_code, -1), 4)
+            use.append(temp if temp >= 0 else -1)
+            temp = round(wb_fault[i] / wb_unit_ele_num.get(wb_unit_name, -1), 4)
+            wb.append(temp if temp >= 0 else -1)
 
-        if any(n < 0 for n in _set) or any(n < 0 for n in make) or any(n < 0 for n in insp) or any(n < 0 for n in use) or any(n < 0 for n in wb):
-            continue
         # 插入正样本
         insert = "INSERT INTO dt_yc.model_ele_train_feature VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, DATE_FORMAT(%s, '%%Y-%%m-%%d'))"
         val = [1, equ1, equ2, equ3, apply1, apply2, apply3, apply4, apply5, apply6, apply7, apply8, apply9, 
@@ -405,8 +551,8 @@ def generate_train_data(train_ratio, test_ratio, test_fault_window):
         for i in range(ratio):
             while True:
                 nf_ele = random.choice(ele_list)
-                if [nf_ele[9], form_create_time] not in fault_ele_time_list:
-                    # 该电梯在form_create_time未发生故障，退出循环
+                if ([nf_ele[9], form_create_time] not in fault_ele_time_list) and (str(nf_ele[2]) <= form_create_time):
+                    # 该电梯在form_create_time未发生故障，且该电梯投用日期在form_create_time前，退出循环
                     break
 
             nf_equ_safe_level = nf_ele[0]
@@ -538,14 +684,17 @@ def generate_train_data(train_ratio, test_ratio, test_fault_window):
             nf_wb = []
 
             for i in range(6):
-                nf_set.append(round(nf_set_fault[i] / set_unit_ele_num.get(nf_set_unit_name, -1), 4))
-                nf_make.append(round(nf_make_fault[i] / make_unit_ele_num.get(nf_make_unit_name, -1), 4))
-                nf_insp.append(round(nf_insp_fault[i] / insp_org_ele_num.get(nf_insp_org_name, -1), 4))
-                nf_use.append(round(nf_use_fault[i] / use_unit_ele_num.get(nf_use_unit_code, -1), 4))
-                nf_wb.append(round(nf_wb_fault[i] / wb_unit_ele_num.get(nf_wb_unit_name, -1), 4))
+                temp = round(nf_set_fault[i] / set_unit_ele_num.get(nf_set_unit_name, -1), 4)
+                nf_set.append(temp if temp >= 0 else -1)
+                temp = round(nf_make_fault[i] / make_unit_ele_num.get(nf_make_unit_name, -1), 4)
+                nf_make.append(temp if temp >= 0 else -1)
+                temp = round(nf_insp_fault[i] / insp_org_ele_num.get(nf_insp_org_name, -1), 4)
+                nf_insp.append(temp if temp >= 0 else -1)
+                temp = round(nf_use_fault[i] / use_unit_ele_num.get(nf_use_unit_code, -1), 4)
+                nf_use.append(temp if temp >= 0 else -1)
+                temp = round(nf_wb_fault[i] / wb_unit_ele_num.get(nf_wb_unit_name, -1), 4)
+                nf_wb.append(temp if temp >= 0 else -1)
 
-            if any(n < 0 for n in nf_set) or any(n < 0 for n in nf_make) or any(n < 0 for n in nf_insp) or any(n < 0 for n in nf_use) or any(n < 0 for n in nf_wb):
-                continue
             # 插入负样本
             insert = "INSERT INTO dt_yc.model_ele_train_feature VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, DATE_FORMAT(%s, '%%Y-%%m-%%d'))"
             val = [0, nf_equ1, nf_equ2, nf_equ3, nf_apply1, nf_apply2, nf_apply3, nf_apply4, nf_apply5, nf_apply6, nf_apply7, nf_apply8, nf_apply9, 
@@ -559,11 +708,11 @@ def generate_train_data(train_ratio, test_ratio, test_fault_window):
             if cnt % 1000 == 0:
                 print('插入样本中，目前已完成' + str(cnt) + '条')
 
-    print('训练数据插入完成')
-
     cursor.close()
     conn.close()
     elapsed = (time.time() - start)
     print('训练特征提取完毕，总运行时间：' + str(round(elapsed/60, 2)) + '分钟')
     print('------------------------------------------------------')
     print('------------------------------------------------------')
+
+generate_train_data(50, 600, 200)
