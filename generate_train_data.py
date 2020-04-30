@@ -714,5 +714,3 @@ def generate_train_data(train_ratio, test_ratio, test_fault_window):
     print('训练特征提取完毕，总运行时间：' + str(round(elapsed/60, 2)) + '分钟')
     print('------------------------------------------------------')
     print('------------------------------------------------------')
-
-generate_train_data(50, 600, 200)
