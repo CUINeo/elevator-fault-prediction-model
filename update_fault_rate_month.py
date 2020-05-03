@@ -20,7 +20,7 @@ def update_fault_rate_month():
 	conn = pymysql.connect(host='10.214.163.179', user='dt_yc', password='dt_yc123', port=3306, database='dt_yc')
 	cursor = conn.cursor()
 
-	# -------------------------------- 统计电梯数量表格 --------------------------------
+	# -------------------------------- 统计电梯表格 --------------------------------
 	# 使用单位电梯数量
 	query1 = 'DROP TABLE IF EXISTS dt_yc.model_use_unit_ele_num'
 	query2 = """

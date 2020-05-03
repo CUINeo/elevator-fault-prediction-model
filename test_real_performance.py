@@ -16,16 +16,11 @@ def test_real_performance(method_name, date, window=1):
     reader = csv.reader(csv_file)
     rows = list(reader)
 
-    cnt = 0
     predict_X = []
     tranid_set = []
     for row in rows:
         tranid_set.append(row[0])
         predict_X.append(row[1:])
-
-        cnt = cnt + 1
-        if cnt % 10000 == 0:
-            print('电梯特征读取中，已完成' + str(cnt) + '条')
 
     predict_X = [[float(i) if i.replace('.', '', 1).isdigit() else 0 for i in j] for j in predict_X]
     predict_X = np.asarray(predict_X, dtype=np.float32)
@@ -82,10 +77,10 @@ def test_real_performance(method_name, date, window=1):
     
     precision = float(tp / (tp + fp))
     recall = float(tp / (tp + fn))
-    f1_score = float(2 * (recall * precision) / (recall + precision))
+    # f1_score = float(2 * (recall * precision) / (recall + precision))
 
     if method_name == 'rf':
-        print('Randon Forest:')
+        print('Random Forest:')
     elif method_name == 'dt':
         print('Decision Tree:')
     elif method_name == 'knn':
@@ -99,12 +94,15 @@ def test_real_performance(method_name, date, window=1):
     print([[tp, fn], [fp, tn]])
     print('Precision: ' + str(precision))
     print('Recall: ' + str(recall))
-    print('F1 Score: ' + str(f1_score))
+    # print('F1 Score: ' + str(f1_score))
+
+    print('------------------------------------------------------')
+    print('------------------------------------------------------')
 
     cursor.close()
     conn.close()
 
-date = '2020-04-20'
+date = '2020-03-20'
 test_real_performance('rf', date)
-test_real_performance('dt', date)
-test_real_performance('knn', date)
+# test_real_performance('dt', date)
+# test_real_performance('knn', date)

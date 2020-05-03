@@ -493,7 +493,11 @@ def generate_train_data(train_ratio, test_ratio, test_fault_window):
             form_create_time_fault = str(fault_ele[9])[0:10]
             tranid_fault = fault_ele[10]
 
-            months_diff = get_use_months(form_create_time, form_create_time_fault)            
+            # 生成训练正样本时不统计该条故障数据本身（一台电梯不会在同一天发生两次故障）
+            if tranid == tranid_fault and form_create_time == form_create_time_fault:
+                continue
+
+            months_diff = get_use_months(form_create_time, form_create_time_fault)
             if months_diff > 6 or months_diff < 1:
                 continue
 

@@ -5,11 +5,9 @@ import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 from datetime import date, datetime, timedelta
 
-
 # 返回当前日期
 def get_current_date():
     return datetime.today().strftime('%Y-%m-%d')
-
 
 # 返回从start_date到current_date之间的月数
 def get_use_months(current_date, start_date):
@@ -26,7 +24,6 @@ def get_use_months(current_date, start_date):
 
     return int(diff / 30) + 1
 
-
 # 返回day之前30天的日期集合（yyyy-mm-dd格式）
 def get_previous_month(day, diff):
     ret = []
@@ -39,7 +36,6 @@ def get_previous_month(day, diff):
 
     return ret
 
-
 # 返回day之前30天的日期（yyyy-mm-dd格式）
 def get_previous_diff_date(day, diff):
     year = int(day[0:4])
@@ -47,7 +43,6 @@ def get_previous_diff_date(day, diff):
     day = int(day[8:10])
 
     return (date(year, month, day) - timedelta(diff)).strftime('%Y-%m-%d')
-
 
 # 对数据仓库进行预处理
 def prepare_table():
@@ -69,7 +64,6 @@ def prepare_table():
     
     cursor.close()
     conn.close()
-
 
 # 使用t-sne对训练数据进行降维并使用图表显示，start与end为表的特征区间，title为标题
 def visualize_train_data_tsne(start, end, title, perplexity):

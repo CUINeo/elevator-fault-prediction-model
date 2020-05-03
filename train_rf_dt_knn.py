@@ -76,7 +76,7 @@ def train_rf_dt_knn(test_set_len):
     pred_test_Y = clf.predict(test_X)
     print(confusion_matrix(test_Y, pred_test_Y))
     print(classification_report(test_Y, pred_test_Y))
-    performance(method, confusion_matrix(test_Y, pred_test_Y))
+    # performance(method, confusion_matrix(test_Y, pred_test_Y))
     dump(clf, 'rf.joblib')
 
     method = train_decision_tree
@@ -89,7 +89,7 @@ def train_rf_dt_knn(test_set_len):
     pred_test_Y = clf.predict(test_X)
     print(confusion_matrix(test_Y, pred_test_Y))
     print(classification_report(test_Y, pred_test_Y))
-    performance(method, confusion_matrix(test_Y, pred_test_Y))
+    # performance(method, confusion_matrix(test_Y, pred_test_Y))
     dump(clf, 'dt.joblib')
 
     method = train_knn
@@ -102,7 +102,7 @@ def train_rf_dt_knn(test_set_len):
     pred_test_Y = knn.predict(test_X)
     print(confusion_matrix(test_Y, pred_test_Y))
     print(classification_report(test_Y, pred_test_Y))
-    performance(method, confusion_matrix(test_Y, pred_test_Y))
+    # performance(method, confusion_matrix(test_Y, pred_test_Y))
     dump(knn, 'knn.joblib')
 
     cursor.close()
@@ -141,3 +141,5 @@ def performance(method, confusion_matrix):
 
     cursor.close()
     conn.close()
+
+train_rf_dt_knn(33660)
