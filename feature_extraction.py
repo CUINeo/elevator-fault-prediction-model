@@ -7,11 +7,11 @@ from datetime import datetime
 from utils import get_use_months
 from utils import get_current_date
 
-#   host='10.214.163.179'
-#   user='dt_yc'
-#   password='dt_yc123'
-#   port=3306
-#   database='dt_yc'
+# host='10.214.163.179'
+# user='dt_yc'
+# password='dt_yc123'
+# port=3306
+# database='dt_yc'
 
 def feature_extraction():
 	# 作为dict访问的默认值
@@ -262,61 +262,46 @@ def feature_extraction():
 		elif apply_location == '体育场馆':
 			apply18 = 1
 
-		use = use_unit_fault_rate.get(use_unit_code, None)
-		make = make_unit_fault_rate.get(make_unit_name, None)
-		_set = set_unit_fault_rate.get(set_unit_name, None)
-		insp = insp_org_fault_rate.get(insp_org_name, None)
-		wb = wb_unit_fault_rate.get(wb_unit_name, None)
+		use = use_unit_fault_rate.get(use_unit_code, [0, 0, 0, 0, 0, 0])
+		make = make_unit_fault_rate.get(make_unit_name, [0, 0, 0, 0, 0, 0])
+		_set = set_unit_fault_rate.get(set_unit_name, [0, 0, 0, 0, 0, 0])
+		insp = insp_org_fault_rate.get(insp_org_name, [0, 0, 0, 0, 0, 0])
+		wb = wb_unit_fault_rate.get(wb_unit_name, [0, 0, 0, 0, 0, 0])
 
-		if use is not None:
-			use1 = use[0]
-			use2 = use[1]
-			use3 = use[2]
-			use4 = use[3]
-			use5 = use[4]
-			use6 = use[5]
-		else:
-			use1 = use2 = use3 = use4 = use5 = use6 = -1
-		
-		if make is not None:
-			make1 = make[0]
-			make2 = make[1]
-			make3 = make[2]
-			make4 = make[3]
-			make5 = make[4]
-			make6 = make[5]
-		else:
-			make1 = make2 = make3 = make4 = make5 = make6 = -1
+		use1 = use[0]
+		use2 = use[1]
+		use3 = use[2]
+		use4 = use[3]
+		use5 = use[4]
+		use6 = use[5]
+	
+		make1 = make[0]
+		make2 = make[1]
+		make3 = make[2]
+		make4 = make[3]
+		make5 = make[4]
+		make6 = make[5]
 
-		if _set is not None:
-			set1 = _set[0]
-			set2 = _set[1]
-			set3 = _set[2]
-			set4 = _set[3]
-			set5 = _set[4]
-			set6 = _set[5]
-		else:
-			set1 = set2 = set3 = set4 = set5 = set6 = -1
-		
-		if insp is not None:
-			insp1 = insp[0]
-			insp2 = insp[1]
-			insp3 = insp[2]
-			insp4 = insp[3]
-			insp5 = insp[4]
-			insp6 = insp[5]
-		else:
-			insp1 = insp2 = insp3 = insp4 = insp5 = insp6 = -1
+		set1 = _set[0]
+		set2 = _set[1]
+		set3 = _set[2]
+		set4 = _set[3]
+		set5 = _set[4]
+		set6 = _set[5]
+	
+		insp1 = insp[0]
+		insp2 = insp[1]
+		insp3 = insp[2]
+		insp4 = insp[3]
+		insp5 = insp[4]
+		insp6 = insp[5]
 
-		if wb is not None:
-			wb1 = wb[0]
-			wb2 = wb[1]
-			wb3 = wb[2]
-			wb4 = wb[3]
-			wb5 = wb[4]
-			wb6 = wb[5]
-		else:
-			wb1 = wb2 = wb2 = wb3 = wb4 = wb5 = wb6 = -1
+		wb1 = wb[0]
+		wb2 = wb[1]
+		wb3 = wb[2]
+		wb4 = wb[3]
+		wb5 = wb[4]
+		wb6 = wb[5]
 
 		start_date = str(use_start_date)
 		use_months = get_use_months(current_date, start_date)
@@ -350,3 +335,5 @@ def feature_extraction():
 	print('电梯特征提取完毕，总运行时间：' + str(round(elapsed/60, 2)) + '分钟')
 	print('------------------------------------------------------')
 	print('------------------------------------------------------')
+
+feature_extraction()

@@ -2,6 +2,7 @@ import csv
 import pymysql
 import numpy as np
 from joblib import load
+from operator import itemgetter
 from utils import get_previous_diff_date
 
 # host='10.214.163.179'
@@ -10,7 +11,7 @@ from utils import get_previous_diff_date
 # port=3306
 # database='dt_yc'
 
-def test_real_performance(method_name, date, window=1):
+def test_real_performance(k, method_name, date, window=1):
     csv_file_name = 'features/' + date + '-feature.csv'
     csv_file = open(csv_file_name, 'r')
     reader = csv.reader(csv_file)
@@ -27,15 +28,19 @@ def test_real_performance(method_name, date, window=1):
 
     joblib_name = method_name + '.joblib'
     clf = load(joblib_name)
-    proba = clf.predict_proba(predict_X)
+    proba = list(clf.predict_proba(predict_X))
     # res = clf.predict(predict_X)
 
-    pos_list = []
-    pos = 0
-    for p in proba:
-        if p[1] >= 0.5:
-            pos_list.append(pos)
-        pos = pos + 1
+    # 将proba按照故障概率降序排列
+    proba.sort(key=itemgetter(0))
+    pos_list = range(k)
+
+    # pos_list = []
+    # pos = 0
+    # for p in proba:
+    #     if p[1] < 1000:
+    #         pos_list.append(pos)
+    #     pos = pos + 1
 
     positive_tranid_set = []
     for pos in pos_list:
@@ -102,7 +107,9 @@ def test_real_performance(method_name, date, window=1):
     cursor.close()
     conn.close()
 
+k = 180000
 date = '2020-03-20'
-test_real_performance('rf', date)
-# test_real_performance('dt', date)
-# test_real_performance('knn', date)
+window = 1
+test_real_performance(k, 'rf', date, window)
+test_real_performance(k, 'dt', date, window)
+test_real_performance(k, 'knn', date, window)

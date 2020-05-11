@@ -11,9 +11,6 @@ method_type = 'random forest'
 # method_type = 'decision tree'
 # method_type = 'knn'
 
-# 预测值大于threshold时判定为高危电梯（用于四种模型的真实性能评估）
-threshold = 0.5
-
 # 数据库更新时间为diff天
 diff = 2
 
@@ -25,5 +22,5 @@ update_fault_number_month()
 update_fault_rate_month()
 feature_extraction()
 predict(method_type)
-get_real_performance(method_type, threshold, diff, window)
-get_aggrs(threshold)
+get_real_performance(method_type, diff, window)
+get_aggrs()

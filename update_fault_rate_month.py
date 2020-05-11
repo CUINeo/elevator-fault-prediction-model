@@ -4,12 +4,13 @@ import time
 import pymysql
 from datetime import datetime
 from utils import get_current_date
+from utils import get_previous_diff_date
 
-#   host='10.214.163.179'
-#   user='dt_yc'
-#   password='dt_yc123'
-#   port=3306
-#   database='dt_yc'
+# host='10.214.163.179'
+# user='dt_yc'
+# password='dt_yc123'
+# port=3306
+# database='dt_yc'
 
 def update_fault_rate_month():
 	# 作为dict访问的默认值
@@ -20,7 +21,7 @@ def update_fault_rate_month():
 	conn = pymysql.connect(host='10.214.163.179', user='dt_yc', password='dt_yc123', port=3306, database='dt_yc')
 	cursor = conn.cursor()
 
-	# -------------------------------- 统计电梯表格 --------------------------------
+	# -------------------------------- 统计电梯数量表格 --------------------------------
 	# 使用单位电梯数量
 	query1 = 'DROP TABLE IF EXISTS dt_yc.model_use_unit_ele_num'
 	query2 = """
@@ -208,18 +209,42 @@ def update_fault_rate_month():
 	conn.commit()
 
 	# 统计故障电梯数量
-	date = get_current_date()
-	if date is not None:
+	current_date = get_current_date()
+	if current_date is not None:
+		end_date = get_previous_diff_date(current_date, -1)
 		for i in range(1, 7):
+			start_date = get_previous_diff_date(end_date, 30)
+
 			# 使用单位错误信息聚合
 			query = """
 					SELECT use_unit_code, count(*) fault_num
 					FROM dt_yc.zt_dt_fault
-					WHERE form_create_time < DATE_ADD(DATE_FORMAT(%s,'%%Y-%%m-%%d'), INTERVAL %s MONTH)
-					and form_create_time >= DATE_ADD(DATE_FORMAT(%s,'%%Y-%%m-%%d'), INTERVAL %s MONTH)
+					WHERE form_create_time >= DATE_FORMAT(%s,'%%Y-%%m-%%d')
+					and form_create_time < DATE_FORMAT(%s,'%%Y-%%m-%%d')
+					and use_unit_code is not null
+                    and use_unit_code != '-'
+                    and use_unit_code != '不详'
+                    and make_unit_name is not null
+                    and make_unit_name != '-'
+                    and make_unit_name != '/'
+                    and set_unit_name is not null
+                    and set_unit_name != '-'
+                    and set_unit_name != '/'
+                    and insp_org_name is not null
+                    and insp_org_name != '-'
+                    and insp_org_name != '/'
+                    and wb_unit_name is not null
+                    and wb_unit_name != '/'
+                    and wb_unit_name != '*'
+                    and wb_unit_name != '0'
+                    and wb_unit_name != '//'
+                    and wb_unit_name != '-'
+                    and wb_unit_name != '--'
+                    and wb_unit_name != '**'
+                    and wb_unit_name != '1'
 					GROUP BY use_unit_code
 					"""
-			var = [date, str(1-i), date, str(-i)]
+			var = [start_date, end_date]
 			cursor.execute(query, var)
 			rows = cursor.fetchall()
 			for row in rows:
@@ -236,11 +261,32 @@ def update_fault_rate_month():
 			query = """
 					SELECT make_unit_name, count(*) fault_num
 					FROM dt_yc.zt_dt_fault
-					WHERE form_create_time < DATE_ADD(DATE_FORMAT(%s,'%%Y-%%m-%%d'), INTERVAL %s MONTH)
-					and form_create_time >= DATE_ADD(DATE_FORMAT(%s,'%%Y-%%m-%%d'), INTERVAL %s MONTH)
+					WHERE form_create_time >= DATE_FORMAT(%s,'%%Y-%%m-%%d')
+					and form_create_time < DATE_FORMAT(%s,'%%Y-%%m-%%d')
+					and use_unit_code is not null
+                    and use_unit_code != '-'
+                    and use_unit_code != '不详'
+                    and make_unit_name is not null
+                    and make_unit_name != '-'
+                    and make_unit_name != '/'
+                    and set_unit_name is not null
+                    and set_unit_name != '-'
+                    and set_unit_name != '/'
+                    and insp_org_name is not null
+                    and insp_org_name != '-'
+                    and insp_org_name != '/'
+                    and wb_unit_name is not null
+                    and wb_unit_name != '/'
+                    and wb_unit_name != '*'
+                    and wb_unit_name != '0'
+                    and wb_unit_name != '//'
+                    and wb_unit_name != '-'
+                    and wb_unit_name != '--'
+                    and wb_unit_name != '**'
+                    and wb_unit_name != '1'
 					GROUP BY make_unit_name
 					"""
-			var = [date, str(1-i), date, str(-i)]
+			var = [start_date, end_date]
 			cursor.execute(query, var)
 			rows = cursor.fetchall()
 			for row in rows:
@@ -257,11 +303,32 @@ def update_fault_rate_month():
 			query = """
 					SELECT set_unit_name, count(*) fault_num
 					FROM dt_yc.zt_dt_fault
-					WHERE form_create_time < DATE_ADD(DATE_FORMAT(%s,'%%Y-%%m-%%d'), INTERVAL %s MONTH)
-					and form_create_time >= DATE_ADD(DATE_FORMAT(%s,'%%Y-%%m-%%d'), INTERVAL %s MONTH)
+					WHERE form_create_time >= DATE_FORMAT(%s,'%%Y-%%m-%%d')
+					and form_create_time < DATE_FORMAT(%s,'%%Y-%%m-%%d')
+					and use_unit_code is not null
+                    and use_unit_code != '-'
+                    and use_unit_code != '不详'
+                    and make_unit_name is not null
+                    and make_unit_name != '-'
+                    and make_unit_name != '/'
+                    and set_unit_name is not null
+                    and set_unit_name != '-'
+                    and set_unit_name != '/'
+                    and insp_org_name is not null
+                    and insp_org_name != '-'
+                    and insp_org_name != '/'
+                    and wb_unit_name is not null
+                    and wb_unit_name != '/'
+                    and wb_unit_name != '*'
+                    and wb_unit_name != '0'
+                    and wb_unit_name != '//'
+                    and wb_unit_name != '-'
+                    and wb_unit_name != '--'
+                    and wb_unit_name != '**'
+                    and wb_unit_name != '1'
 					GROUP BY set_unit_name
 					"""
-			var = [date, str(1-i), date, str(-i)]
+			var = [start_date, end_date]
 			cursor.execute(query, var)
 			rows = cursor.fetchall()
 			for row in rows:
@@ -277,12 +344,33 @@ def update_fault_rate_month():
 			# 检验机构错误信息聚合
 			query = """
 					SELECT insp_org_name, count(*) fault_num
-					FROM dt_yc.zt_dt_fault a
-					WHERE form_create_time < DATE_ADD(DATE_FORMAT(%s,'%%Y-%%m-%%d'), INTERVAL %s MONTH)
-					and form_create_time >= DATE_ADD(DATE_FORMAT(%s,'%%Y-%%m-%%d'), INTERVAL %s MONTH)
+					FROM dt_yc.zt_dt_fault
+					WHERE form_create_time >= DATE_FORMAT(%s,'%%Y-%%m-%%d')
+					and form_create_time < DATE_FORMAT(%s,'%%Y-%%m-%%d')
+					and use_unit_code is not null
+                    and use_unit_code != '-'
+                    and use_unit_code != '不详'
+                    and make_unit_name is not null
+                    and make_unit_name != '-'
+                    and make_unit_name != '/'
+                    and set_unit_name is not null
+                    and set_unit_name != '-'
+                    and set_unit_name != '/'
+                    and insp_org_name is not null
+                    and insp_org_name != '-'
+                    and insp_org_name != '/'
+                    and wb_unit_name is not null
+                    and wb_unit_name != '/'
+                    and wb_unit_name != '*'
+                    and wb_unit_name != '0'
+                    and wb_unit_name != '//'
+                    and wb_unit_name != '-'
+                    and wb_unit_name != '--'
+                    and wb_unit_name != '**'
+                    and wb_unit_name != '1'
 					GROUP BY insp_org_name
 					"""
-			var = [date, str(1-i), date, str(-i)]
+			var = [start_date, end_date]
 			cursor.execute(query, var)
 			rows = cursor.fetchall()
 			for row in rows:
@@ -298,12 +386,33 @@ def update_fault_rate_month():
 			# 维保单位错误信息聚合
 			query = """
 					SELECT wb_unit_name, count(*) fault_num
-					FROM dt_yc.zt_dt_fault a
-					WHERE form_create_time < DATE_ADD(DATE_FORMAT(%s,'%%Y-%%m-%%d'), INTERVAL %s MONTH)
-					and form_create_time >= DATE_ADD(DATE_FORMAT(%s,'%%Y-%%m-%%d'), INTERVAL %s MONTH)
+					FROM dt_yc.zt_dt_fault
+					WHERE form_create_time >= DATE_FORMAT(%s,'%%Y-%%m-%%d')
+					and form_create_time < DATE_FORMAT(%s,'%%Y-%%m-%%d')
+					and use_unit_code is not null
+                    and use_unit_code != '-'
+                    and use_unit_code != '不详'
+                    and make_unit_name is not null
+                    and make_unit_name != '-'
+                    and make_unit_name != '/'
+                    and set_unit_name is not null
+                    and set_unit_name != '-'
+                    and set_unit_name != '/'
+                    and insp_org_name is not null
+                    and insp_org_name != '-'
+                    and insp_org_name != '/'
+                    and wb_unit_name is not null
+                    and wb_unit_name != '/'
+                    and wb_unit_name != '*'
+                    and wb_unit_name != '0'
+                    and wb_unit_name != '//'
+                    and wb_unit_name != '-'
+                    and wb_unit_name != '--'
+                    and wb_unit_name != '**'
+                    and wb_unit_name != '1'
 					GROUP BY wb_unit_name
 					"""
-			var = [date, str(1-i), date, str(-i)]
+			var = [start_date, end_date]
 			cursor.execute(query, var)
 			rows = cursor.fetchall()
 			for row in rows:
@@ -316,6 +425,7 @@ def update_fault_rate_month():
 				cursor.execute(insert, var)
 				conn.commit()
 
+			end_date = start_date
 			print('第' + str(i) + '个月数据处理完成')
 
 	temp = time.time()
@@ -352,7 +462,7 @@ def update_fault_rate_month():
 	print('电梯数量信息读取完毕，运行时间：' + str(temp - flag))
 	flag = temp
 
-	# -------------------------------- ele_info故障率计算 --------------------------------
+	# -------------------------------- 故障率计算 --------------------------------
 	# 删除原先故障率表格
 	query1 = 'DROP TABLE IF EXISTS dt_yc.model_use_unit_fault_rate'
 	query2 = 'DROP TABLE IF EXISTS dt_yc.model_make_unit_fault_rate'
@@ -541,6 +651,10 @@ def update_fault_rate_month():
 			fault_rate = round(fault_rate, 4)
 			var.append(fault_rate)
 
+		# 提高效率，六个月内无故障的单位不进行插入
+		if var[1:] == [0, 0, 0, 0, 0, 0]:
+			continue
+
 		insert = 'INSERT INTO dt_yc.model_use_unit_fault_rate VALUES(%s, %s, %s, %s, %s, %s, %s)'
 		cursor.execute(insert, var)
 		conn.commit()
@@ -564,6 +678,10 @@ def update_fault_rate_month():
 			fault_rate = fault_num / ele_num
 			fault_rate = round(fault_rate, 4)
 			var.append(fault_rate)
+
+		# 提高效率，六个月内无故障的单位不进行插入
+		if var[1:] == [0, 0, 0, 0, 0, 0]:
+			continue
 
 		insert = 'INSERT INTO dt_yc.model_make_unit_fault_rate VALUES(%s, %s, %s, %s, %s, %s, %s)'
 		cursor.execute(insert, var)
@@ -589,6 +707,10 @@ def update_fault_rate_month():
 			fault_rate = round(fault_rate, 4)
 			var.append(fault_rate)
 
+		# 提高效率，六个月内无故障的单位不进行插入
+		if var[1:] == [0, 0, 0, 0, 0, 0]:
+			continue
+
 		insert = 'INSERT INTO dt_yc.model_set_unit_fault_rate VALUES(%s, %s, %s, %s, %s, %s, %s)'
 		cursor.execute(insert, var)
 		conn.commit()
@@ -612,6 +734,10 @@ def update_fault_rate_month():
 			fault_rate = fault_num / ele_num
 			fault_rate = round(fault_rate, 4)
 			var.append(fault_rate)
+
+		# 提高效率，六个月内无故障的单位不进行插入
+		if var[1:] == [0, 0, 0, 0, 0, 0]:
+			continue
 
 		insert = 'INSERT INTO dt_yc.model_insp_org_fault_rate VALUES(%s, %s, %s, %s, %s, %s, %s)'
 		cursor.execute(insert, var)
@@ -637,6 +763,10 @@ def update_fault_rate_month():
 			fault_rate = round(fault_rate, 4)
 			var.append(fault_rate)
 
+		# 提高效率，六个月内无故障的单位不进行插入
+		if var[1:] == [0, 0, 0, 0, 0, 0]:
+			continue
+
 		insert = 'INSERT INTO dt_yc.model_wb_unit_fault_rate VALUES(%s, %s, %s, %s, %s, %s, %s)'
 		cursor.execute(insert, var)
 		conn.commit()
@@ -650,3 +780,5 @@ def update_fault_rate_month():
 	print('使用、制造、安装、维保单位与检验机构故障率统计完毕，总运行时间：' + str(round(elapsed/60, 2)) + '分钟')
 	print('------------------------------------------------------')
 	print('------------------------------------------------------')
+
+update_fault_rate_month()

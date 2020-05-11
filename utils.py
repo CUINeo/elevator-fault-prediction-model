@@ -36,7 +36,7 @@ def get_previous_month(day, diff):
 
     return ret
 
-# 返回day之前30天的日期（yyyy-mm-dd格式）
+# 返回day之前diff天的日期（yyyy-mm-dd格式）
 def get_previous_diff_date(day, diff):
     year = int(day[0:4])
     month = int(day[5:7])

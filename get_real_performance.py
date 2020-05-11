@@ -9,7 +9,7 @@ from utils import get_current_date, get_previous_diff_date
 # database='dt_yc'
 
 # 使用实际数据与(diff + window - 1)天前的预测数据进行比对，得出模型真实性能，存入数据库中
-def get_real_performance(method_type, threshold, diff, window):
+def get_real_performance(method_type, diff, window, threshold=0.5):
     conn = pymysql.connect(host='10.214.163.179', user='dt_yc', password='dt_yc123', port=3306, database='dt_yc')
     cursor = conn.cursor()
 
